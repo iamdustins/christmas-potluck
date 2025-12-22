@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Christmas Dinner Tracker 🎄</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f8f9fa; padding: 15px; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #c0392b; text-align: center; margin-bottom: 5px; }
+        .info { text-align: center; color: #27ae60; font-weight: bold; margin-bottom: 20px; }
+        input, select { width: 95%; padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
+        button { width: 100%; background-color: #c0392b; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; font-size: 16px; margin-top: 10px; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background-color: #2c3e50; color: white; padding: 10px; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; }
+        .summary { background: #ecf0f1; padding: 15px; border-radius: 8px; margin-top: 20px; display: flex; justify-content: space-around; font-weight: bold; }
+        .del-btn { color: #c0392b; font-weight: bold; cursor: pointer; border: none; background: none; width: auto; padding: 0; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Christmas Potluck 🎄</h1>
+    <div class="info">Dec 25th @ 3:00 PM</div>
+
+    <input type="text" id="userName" placeholder="Your Name">
+    <input type="text" id="foodItem" placeholder="What are you bringing?">
+    <select id="category">
+        <option value="Side">Side Dish / Snack</option>
+        <option value="Soda">Soda 🥤</option>
+        <option value="Chips">Chips 🥔</option>
+        <option value="Main Dish">Main Dish</option>
+        <option value="Dessert">Dessert</option>
+    </select>
+    <button onclick="addItem()">Add to List</button>
+
+    <table id="mealTable">
+        <thead>
+            <tr>
+                <th>Guest</th>
+                <th>Dish</th>
+                <th>Cat</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+
+    <div class="summary">
+        <div>🥤 Sodas: <span id="sodaCount">0</span></div>
+        <div>🥔 Chips: <span id="chipsCount">0</span></div>
+    </div>
+</div>
+
+<script>
+    window.onload = loadData;
+
+    function addItem() {
+        const name = document.getElementById('userName').value;
+        const dish = document.getElementById('foodItem').value;
+        const cat = document.getElementById('category').value;
+
+        if (!name || !dish) return alert("Please enter your name and dish!");
+
+        const items = JSON.parse(localStorage.getItem('xmasList') || '[]');
+        items.push({ name, dish, cat });
+        localStorage.setItem('xmasList', JSON.stringify(items));
+
+        render();
+        document.getElementById('userName').value = '';
+        document.getElementById('foodItem').value = '';
+    }
+
+    function render() {
+        const items = JSON.parse(localStorage.getItem('xmasList') || '[]');
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+        let s = 0, c = 0;
+
+        items.forEach((item, index) => {
+            const row = tbody.insertRow();
+            row.innerHTML = `<td>${item.name}</td><td>${item.dish}</td><td>${item.cat}</td>
+                             <td><button class="del-btn" onclick="deleteItem(${index})">X</button></td>`;
+            if (item.cat === "Soda") s++;
+            if (item.cat === "Chips") c++;
+        });
+
+        document.getElementById('sodaCount').innerText = s;
+        document.getElementById('chipsCount').innerText = c;
+    }
+
+    function deleteItem(index) {
+        const items = JSON.parse(localStorage.getItem('xmasList'));
+        items.splice(index, 1);
+        localStorage.setItem('xmasList', JSON.stringify(items));
+        render();
+    }
+
+    function loadData() {
+        if (!localStorage.getItem('xmasList')) {
+            const defaults = [
+                {name: 'Dustin', dish: 'Turkey & Sides', cat: 'Main Dish'},
+                {name: 'Atsumi', dish: 'Ham', cat: 'Main Dish'}
+            ];
+            localStorage.setItem('xmasList', JSON.stringify(defaults));
+        }
+        render();
+    }
+</script>
+
+</body>
+</html>
