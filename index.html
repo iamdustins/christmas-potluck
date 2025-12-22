@@ -60,7 +60,7 @@
                     <option value="easter">Easter 🐰</option>
                     <option value="july4th">4th of July 🎆</option>
                     <option value="newyears">New Year's 🥂</option>
-                    <option value="generic">Special Occasion ✨</option>
+                    <option value="generic">Family Gathering ✨</option>
                 </select>
             </div>
             <div id="auth-status" class="font-semibold text-gray-400">Syncing...</div>
@@ -160,7 +160,7 @@
                 </div>
                 <div class="flex gap-3 mt-6">
                     <button onclick="closeEditModal()" class="flex-1 py-3 text-gray-400 font-bold hover:bg-gray-100 rounded-xl transition">Cancel</button>
-                    <button onclick="saveEdit()" class="flex-1 py-3 theme-bg text-white font-bold rounded-xl shadow-lg transition">Save</button>
+                    <button onclick="saveEdit()" class="flex-1 py-3 theme-bg text-white font-bold rounded-xl shadow-lg transition">Save Changes</button>
                 </div>
             </div>
         </div>
@@ -170,6 +170,25 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // =====================================================================
+        // STEP 1: FIREBASE CONFIGURATION (FOR GITHUB)
+        // =====================================================================
+        // To make this work on GitHub, you MUST replace 'null' with your config:
+        
+        const EXTERNAL_FIREBASE_CONFIG = null; 
+
+        /* Paste your object here like this:
+        const EXTERNAL_FIREBASE_CONFIG = {
+            apiKey: "AIza...",
+            authDomain: "...",
+            projectId: "...",
+            storageBucket: "...",
+            messagingSenderId: "...",
+            appId: "..."
+        };
+        */
+        // =====================================================================
 
         // State & Configuration
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'holiday-potluck-app';
@@ -186,21 +205,26 @@
             generic: { title: "Family Gathering Tracker ✨", color: "#2c3e50" }
         };
 
-        // Initialize Firebase
         const startApp = async () => {
             const statusEl = document.getElementById('auth-status');
             try {
-                if (typeof __firebase_config === 'undefined') {
+                let config = null;
+                if (typeof __firebase_config !== 'undefined') {
+                    config = JSON.parse(__firebase_config);
+                } else if (EXTERNAL_FIREBASE_CONFIG) {
+                    config = EXTERNAL_FIREBASE_CONFIG;
+                }
+
+                if (!config) {
                     statusEl.innerText = "Config Missing ❌";
+                    statusEl.classList.add('text-red-400');
                     return;
                 }
 
-                const firebaseConfig = JSON.parse(__firebase_config);
-                const app = initializeApp(firebaseConfig);
+                const app = initializeApp(config);
                 auth = getAuth(app);
                 db = getFirestore(app);
 
-                // Listen for Auth changes
                 onAuthStateChanged(auth, (user) => {
                     currentUser = user;
                     if (user) {
@@ -212,7 +236,6 @@
                     }
                 });
 
-                // Rule 3: Auth Before Queries
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
@@ -220,18 +243,15 @@
                 }
             } catch (e) {
                 console.error("Initialization Failed:", e);
-                statusEl.innerText = "Connection Error ⚠️";
-                statusEl.classList.add('text-red-500');
+                statusEl.innerText = "Error ⚠️";
             }
         };
 
         function loadData() {
             if (!db || !currentUser) return;
-
             const itemsCol = collection(db, 'artifacts', appId, 'public', 'data', 'mealItems');
             const settingsDoc = doc(db, 'artifacts', appId, 'public', 'data', 'eventSettings', 'main');
 
-            // Header/Theme Sync
             onSnapshot(settingsDoc, (snap) => {
                 if (snap.exists()) {
                     const data = snap.data();
@@ -243,9 +263,8 @@
                 } else {
                     setDoc(settingsDoc, { date: "Dec 25th", time: "3:00 PM", theme: 'christmas' }).catch(console.error);
                 }
-            }, (err) => console.error("Settings error:", err));
+            });
 
-            // Potluck Items Sync
             onSnapshot(itemsCol, (snap) => {
                 const list = document.getElementById('meal-list');
                 const empty = document.getElementById('empty-state');
@@ -265,7 +284,6 @@
                     empty.classList.remove('hidden');
                 } else {
                     empty.classList.add('hidden');
-                    // Simple memory sort to avoid complex index requirements
                     items.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
                     items.forEach(item => {
                         const row = document.createElement('tr');
@@ -296,7 +314,7 @@
                         <span class="theme-text text-lg">${count}</span>
                     </div>
                 `).join('');
-            }, (err) => console.error("Items error:", err));
+            });
         }
 
         function applyTheme(theme) {
@@ -316,41 +334,31 @@
             `;
         }
 
-        // --- GLOBAL ACTIONS ---
-
         window.addNewItem = async () => {
             const name = document.getElementById('new-name').value;
             const item = document.getElementById('new-item').value;
             const eta = document.getElementById('new-eta').value || "TBD";
             const category = document.getElementById('new-category').value;
             
-            if (!name || !item) {
-                alert("Please enter a name and item!");
-                return;
-            }
-
-            if (!db || !currentUser) {
-                alert("App is still connecting. Please wait a moment.");
-                return;
-            }
+            if (!name || !item) { alert("Name and dish are required!"); return; }
+            if (!currentUser) { alert("Still connecting to database..."); return; }
 
             const btn = document.getElementById('add-btn');
             const originalContent = btn.innerHTML;
             btn.disabled = true;
-            btn.innerHTML = '<div class="flex items-center gap-2"><div class="loading-spinner"></div> Saving...</div>';
+            btn.innerHTML = '<div class="flex items-center gap-2 justify-center"><div class="loading-spinner"></div> Saving...</div>';
 
             try {
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'mealItems'), {
                     name, item, eta, category, timestamp: Date.now()
                 });
-                // Clear fields
                 document.getElementById('new-name').value = '';
                 document.getElementById('new-item').value = '';
                 document.getElementById('new-eta').value = '';
                 document.getElementById('new-category').value = 'Other';
             } catch (err) {
-                console.error("Save failed:", err);
-                alert("Save failed. Please check your connection.");
+                console.error(err);
+                alert("Error saving to database.");
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalContent;
@@ -364,15 +372,14 @@
             const theme = document.getElementById('theme-selector').value;
             try {
                 await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'eventSettings', 'main'), { date, time, theme });
-            } catch (err) { console.error("Settings update failed:", err); }
+            } catch (err) { console.error(err); }
         };
 
         window.removeItem = async (id) => {
-            if (!db || !currentUser) return;
             if (confirm("Remove this entry?")) {
                 try {
                     await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'mealItems', id));
-                } catch (err) { console.error("Remove failed:", err); }
+                } catch (err) { console.error(err); }
             }
         };
 
@@ -393,7 +400,7 @@
         };
 
         window.saveEdit = async () => {
-            if (!db || !currentUser || !editingId) return;
+            if (!editingId || !currentUser) return;
             try {
                 await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'mealItems', editingId), {
                     name: document.getElementById('edit-name').value,
@@ -402,10 +409,9 @@
                     category: document.getElementById('edit-category').value
                 });
                 closeEditModal();
-            } catch (err) { console.error("Edit failed:", err); }
+            } catch (err) { console.error(err); }
         };
 
-        // Run on load
         window.addEventListener('DOMContentLoaded', startApp);
     </script>
 </body>
