@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Christmas Dinner Tracker 🎄</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; padding: 15px; color: #2c3e50; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        
+        /* Header & Editable Info */
+        .header { text-align: center; border-bottom: 2px solid #e74c3c; margin-bottom: 20px; padding-bottom: 10px; }
+        h1 { color: #c0392b; margin-bottom: 5px; }
+        .event-info { font-size: 1.1em; color: #27ae60; font-weight: bold; cursor: pointer; }
+        .editable:hover { background: #fff9c4; border-radius: 4px; padding: 2px 5px; }
+
+        /* Form Styling */
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .input-grid input, .input-grid select { padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+        .full-width { grid-column: span 3; display: flex; gap: 10px; }
+        
+        button { background-color: #c0392b; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; flex-grow: 1; }
+        button:hover { background-color: #e74c3c; }
+
+        /* Table Styling */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+        th { background-color: #2c3e50; color: white; padding: 12px; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        .eta-cell { font-weight: bold; color: #2980b9; cursor: pointer; }
+
+        /* Stats Footer */
+        .summary-bar { display: flex; justify-content: space-around; background: #ecf0f1; padding: 15px; border-radius: 8px; margin-top: 20px; font-weight: bold; }
+        .chip-tag { color: #d35400; }
+        .soda-tag { color: #2980b9; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Christmas Dinner Tracker 🎄</h1>
+        <div class="event-info">
+            📅 <span class="editable" contenteditable="true">December 25th</span> | 
+            🕒 Start: <span class="editable" contenteditable="true">3:00 PM</span>
+            <br><small style="color: #7f8c8d; font-weight: normal;">(Click date/time to edit)</small>
+        </div>
+    </div>
+
+    <div class="input-grid">
+        <input type="text" id="userName" placeholder="Your Name (e.g. Jered)">
+        <input type="text" id="foodItem" placeholder="What are you bringing?">
+        <input type="text" id="userEta" placeholder="ETA (e.g. 3:15 PM)">
+        
+        <div class="full-width">
+            <select id="category" style="flex-grow: 1;">
+                <option value="Choice">Select Category...</option>
+                <option value="Main Dish">Main Dish</option>
+                <option value="Side">Side / Snack</option>
+                <option value="Soda">Soda 🥤</option>
+                <option value="Chips">Chips 🥔</option>
+                <option value="Dessert">Dessert</option>
+            </select>
+            <button onclick="addItem()">Add to Table</button>
+        </div>
+    </div>
+
+    <table id="mealTable">
+        <thead>
+            <tr>
+                <th>Guest</th>
+                <th>Dish / Contribution</th>
+                <th>ETA</th>
+                <th>Category</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <tr><td>Host</td><td>Turkey & Veggies</td><td>2:30 PM</td><td>Main/Sides</td></tr>
+            <tr><td>Atsumi</td><td>Ham</td><td>3:00 PM</td><td>Main Dish</td></tr>
+            <tr><td>Guest 3</td><td>7 Layer Dip</td><td class="eta-cell" contenteditable="true">3:00 PM</td><td>Side</td></tr>
+        </tbody>
+    </table>
+
+    <div class="summary-bar">
+        <div class="soda-tag">🥤 Total Sodas: <span id="sodaCount">0</span></div>
+        <div class="chip-tag">🥔 Total Chips: <span id="chipsCount">0</span></div>
+    </div>
+</div>
+
+<script>
+    function addItem() {
+        const name = document.getElementById('userName').value;
+        const dish = document.getElementById('foodItem').value;
+        const eta = document.getElementById('userEta').value || "TBD";
+        const cat = document.getElementById('category').value;
+
+        if (name === '' || dish === '') {
+            alert("Please enter your name and what you're bringing!");
+            return;
+        }
+
+        const table = document.getElementById('tableBody');
+        const row = table.insertRow();
+        
+        row.innerHTML = `
+            <td>${name}</td>
+            <td>${dish}</td>
+            <td class="eta-cell" contenteditable="true">${eta}</td>
+            <td>${cat}</td>
+        `;
+
+        // Reset inputs
+        document.getElementById('userName').value = '';
+        document.getElementById('foodItem').value = '';
+        document.getElementById('userEta').value = '';
+        
+        updateTotals();
+    }
+
+    function updateTotals() {
+        let soda = 0;
+        let chips = 0;
+        const rows = document.getElementById('tableBody').getElementsByTagName('tr');
+
+        for (let row of rows) {
+            const category = row.cells[3].innerText;
+            if (category.includes("Soda")) soda++;
+            if (category.includes("Chips")) chips++;
+        }
+
+        document.getElementById('sodaCount').innerText = soda;
+        document.getElementById('chipsCount').innerText = chips;
+    }
+
+    // Initial count
+    updateTotals();
+</script>
+
+</body>
+</html>
