@@ -19,7 +19,7 @@
         }
 
         .loading-spinner {
-            border: 3px solid #f3f3f3;
+            border: 3px solid rgba(0,0,0,0.1);
             border-top: 3px solid currentColor;
             border-radius: 50%;
             width: 20px;
@@ -63,12 +63,12 @@
                     <option value="generic">Special Occasion ✨</option>
                 </select>
             </div>
-            <div id="auth-status" class="italic opacity-40">Syncing...</div>
+            <div id="auth-status" class="font-semibold text-gray-400">Syncing...</div>
         </div>
 
         <!-- Header -->
         <div class="theme-bg p-8 text-center relative transition-colors">
-            <h1 id="display-title" class="dynamic-header text-4xl md:text-6xl mb-4 tracking-wide">Christmas Dinner Tracker</h1>
+            <h1 id="display-title" class="dynamic-header text-4xl md:text-6xl mb-4 tracking-wide">Meal Tracker</h1>
             <div class="flex flex-col md:flex-row items-center justify-center gap-4 text-white/90 font-semibold">
                 <div class="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
                     <span>📅</span>
@@ -85,8 +85,8 @@
         <div class="p-6 bg-gray-50/50 border-b border-gray-100">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <input type="text" id="new-name" placeholder="Guest Name" class="p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-opacity-50 outline-none">
-                <input type="text" id="new-item" placeholder="What's for dinner?" class="p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-opacity-50 outline-none">
-                <input type="text" id="new-eta" placeholder="ETA (e.g. 3:15 PM)" class="p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-opacity-50 outline-none">
+                <input type="text" id="new-item" placeholder="What are you bringing?" class="p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-opacity-50 outline-none">
+                <input type="text" id="new-eta" placeholder="Arrival Time" class="p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-opacity-50 outline-none">
                 <select id="new-category" class="p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-opacity-50 outline-none bg-white">
                     <option value="Other">Select Category...</option>
                     <option value="Main Dish">Main Dish</option>
@@ -96,7 +96,7 @@
                     <option value="Dessert">Dessert</option>
                     <option value="Alcohol">Alcohol 🍷</option>
                 </select>
-                <button onclick="addNewItem()" id="add-btn" class="md:col-span-4 theme-bg text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg active:scale-95">
+                <button onclick="addNewItem()" id="add-btn" class="md:col-span-4 theme-bg text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
                     <span>✨</span> Add to the List
                 </button>
             </div>
@@ -111,7 +111,7 @@
                         <th class="p-4">Dish / Contribution</th>
                         <th class="p-4">Arrival</th>
                         <th class="p-4">Category</th>
-                        <th class="p-4 text-right">Edit</th>
+                        <th class="p-4 text-right">Action</th>
                     </tr>
                 </thead>
                 <tbody id="meal-list" class="divide-y divide-gray-100">
@@ -134,12 +134,33 @@
         <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
             <h3 class="text-2xl font-bold mb-6 theme-text">Update Information</h3>
             <div class="space-y-4">
-                <input type="text" id="edit-name" class="w-full p-3 border rounded-xl" placeholder="Name">
-                <input type="text" id="edit-item" class="w-full p-3 border rounded-xl" placeholder="Item">
-                <input type="text" id="edit-eta" class="w-full p-3 border rounded-xl" placeholder="ETA">
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Guest Name</label>
+                    <input type="text" id="edit-name" class="w-full p-3 border rounded-xl mt-1" placeholder="Name">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Dish</label>
+                    <input type="text" id="edit-item" class="w-full p-3 border rounded-xl mt-1" placeholder="Item">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Arrival Time</label>
+                    <input type="text" id="edit-eta" class="w-full p-3 border rounded-xl mt-1" placeholder="ETA">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Category</label>
+                    <select id="edit-category" class="w-full p-3 border rounded-xl mt-1 bg-white">
+                        <option value="Main Dish">Main Dish</option>
+                        <option value="Side">Side / Snack</option>
+                        <option value="Soda">Soda 🥤</option>
+                        <option value="Chips">Chips 🥔</option>
+                        <option value="Dessert">Dessert</option>
+                        <option value="Alcohol">Alcohol 🍷</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
                 <div class="flex gap-3 mt-6">
-                    <button onclick="closeEditModal()" class="flex-1 py-3 text-gray-400 font-bold hover:bg-gray-100 rounded-xl">Cancel</button>
-                    <button onclick="saveEdit()" class="flex-1 py-3 theme-bg text-white font-bold rounded-xl shadow-lg">Save</button>
+                    <button onclick="closeEditModal()" class="flex-1 py-3 text-gray-400 font-bold hover:bg-gray-100 rounded-xl transition">Cancel</button>
+                    <button onclick="saveEdit()" class="flex-1 py-3 theme-bg text-white font-bold rounded-xl shadow-lg transition">Save</button>
                 </div>
             </div>
         </div>
@@ -150,6 +171,7 @@
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // State & Configuration
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'holiday-potluck-app';
         let db, auth, currentUser, editingId;
 
@@ -164,31 +186,52 @@
             generic: { title: "Family Gathering Tracker ✨", color: "#2c3e50" }
         };
 
-        window.addEventListener('DOMContentLoaded', async () => {
+        // Initialize Firebase
+        const startApp = async () => {
+            const statusEl = document.getElementById('auth-status');
             try {
+                if (typeof __firebase_config === 'undefined') {
+                    statusEl.innerText = "Config Missing ❌";
+                    return;
+                }
+
                 const firebaseConfig = JSON.parse(__firebase_config);
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
 
+                // Listen for Auth changes
                 onAuthStateChanged(auth, (user) => {
                     currentUser = user;
-                    document.getElementById('auth-status').innerText = user ? 'Connected ✨' : 'Connecting...';
-                    if (user) loadData();
+                    if (user) {
+                        statusEl.innerText = "Synced ✨";
+                        statusEl.classList.add('text-green-500');
+                        loadData();
+                    } else {
+                        statusEl.innerText = "Connecting...";
+                    }
                 });
 
+                // Rule 3: Auth Before Queries
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
                     await signInAnonymously(auth);
                 }
-            } catch (e) { console.error(e); }
-        });
+            } catch (e) {
+                console.error("Initialization Failed:", e);
+                statusEl.innerText = "Connection Error ⚠️";
+                statusEl.classList.add('text-red-500');
+            }
+        };
 
         function loadData() {
+            if (!db || !currentUser) return;
+
             const itemsCol = collection(db, 'artifacts', appId, 'public', 'data', 'mealItems');
             const settingsDoc = doc(db, 'artifacts', appId, 'public', 'data', 'eventSettings', 'main');
 
+            // Header/Theme Sync
             onSnapshot(settingsDoc, (snap) => {
                 if (snap.exists()) {
                     const data = snap.data();
@@ -198,10 +241,11 @@
                     document.getElementById('theme-selector').value = theme;
                     applyTheme(theme);
                 } else {
-                    setDoc(settingsDoc, { date: "Dec 25th", time: "3:00 PM", theme: 'christmas' });
+                    setDoc(settingsDoc, { date: "Dec 25th", time: "3:00 PM", theme: 'christmas' }).catch(console.error);
                 }
-            });
+            }, (err) => console.error("Settings error:", err));
 
+            // Potluck Items Sync
             onSnapshot(itemsCol, (snap) => {
                 const list = document.getElementById('meal-list');
                 const empty = document.getElementById('empty-state');
@@ -221,6 +265,7 @@
                     empty.classList.remove('hidden');
                 } else {
                     empty.classList.add('hidden');
+                    // Simple memory sort to avoid complex index requirements
                     items.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
                     items.forEach(item => {
                         const row = document.createElement('tr');
@@ -236,7 +281,7 @@
                             </td>
                             <td class="p-4 text-right">
                                 <div class="flex justify-end gap-1">
-                                    <button onclick="openEditModal('${item.id}', '${item.name}', '${item.item}', '${item.eta}')" class="p-2 opacity-30 hover:opacity-100 transition">✏️</button>
+                                    <button onclick="openEditModal('${item.id}', '${item.name}', '${item.item}', '${item.eta}', '${item.category}')" class="p-2 opacity-30 hover:opacity-100 transition">✏️</button>
                                     <button onclick="removeItem('${item.id}')" class="p-2 opacity-30 hover:opacity-100 transition">🗑️</button>
                                 </div>
                             </td>
@@ -251,11 +296,11 @@
                         <span class="theme-text text-lg">${count}</span>
                     </div>
                 `).join('');
-            });
+            }, (err) => console.error("Items error:", err));
         }
 
         function applyTheme(theme) {
-            const config = themeData[theme];
+            const config = themeData[theme] || themeData.generic;
             document.body.className = `min-h-screen p-4 md:p-8 theme-${theme}`;
             document.getElementById('display-title').innerText = config.title;
             const styleId = 'dynamic-focus-style';
@@ -265,67 +310,103 @@
                 style.id = styleId;
                 document.head.appendChild(style);
             }
-            style.innerHTML = `input:focus, select:focus { border-color: ${config.color} !important; box-shadow: 0 0 0 2px ${config.color}33 !important; }`;
+            style.innerHTML = `
+                input:focus, select:focus { border-color: ${config.color} !important; box-shadow: 0 0 0 2px ${config.color}33 !important; }
+                .loading-spinner { border-top-color: ${config.color} !important; }
+            `;
         }
+
+        // --- GLOBAL ACTIONS ---
 
         window.addNewItem = async () => {
             const name = document.getElementById('new-name').value;
             const item = document.getElementById('new-item').value;
-            const eta = document.getElementById('new-eta').value || "3:00 PM";
+            const eta = document.getElementById('new-eta').value || "TBD";
             const category = document.getElementById('new-category').value;
-            if (!name || !item) return;
+            
+            if (!name || !item) {
+                alert("Please enter a name and item!");
+                return;
+            }
+
+            if (!db || !currentUser) {
+                alert("App is still connecting. Please wait a moment.");
+                return;
+            }
 
             const btn = document.getElementById('add-btn');
+            const originalContent = btn.innerHTML;
             btn.disabled = true;
-            btn.innerHTML = '<div class="loading-spinner"></div> Adding...';
+            btn.innerHTML = '<div class="flex items-center gap-2"><div class="loading-spinner"></div> Saving...</div>';
 
-            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'mealItems'), {
-                name, item, eta, category, timestamp: Date.now()
-            });
-
-            document.getElementById('new-name').value = '';
-            document.getElementById('new-item').value = '';
-            document.getElementById('new-eta').value = '';
-            btn.disabled = false;
-            btn.innerHTML = '<span>✨</span> Add to the List';
-        };
-
-        window.updateEventSettings = async () => {
-            const date = document.getElementById('event-date').value;
-            const time = document.getElementById('event-time').value;
-            const theme = document.getElementById('theme-selector').value;
-            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'eventSettings', 'main'), { date, time, theme });
-        };
-
-        window.removeItem = async (id) => {
-            if (confirm("Remove this entry?")) {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'mealItems', id));
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'mealItems'), {
+                    name, item, eta, category, timestamp: Date.now()
+                });
+                // Clear fields
+                document.getElementById('new-name').value = '';
+                document.getElementById('new-item').value = '';
+                document.getElementById('new-eta').value = '';
+                document.getElementById('new-category').value = 'Other';
+            } catch (err) {
+                console.error("Save failed:", err);
+                alert("Save failed. Please check your connection.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalContent;
             }
         };
 
-        window.openEditModal = (id, name, item, eta) => {
+        window.updateEventSettings = async () => {
+            if (!db || !currentUser) return;
+            const date = document.getElementById('event-date').value;
+            const time = document.getElementById('event-time').value;
+            const theme = document.getElementById('theme-selector').value;
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'eventSettings', 'main'), { date, time, theme });
+            } catch (err) { console.error("Settings update failed:", err); }
+        };
+
+        window.removeItem = async (id) => {
+            if (!db || !currentUser) return;
+            if (confirm("Remove this entry?")) {
+                try {
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'mealItems', id));
+                } catch (err) { console.error("Remove failed:", err); }
+            }
+        };
+
+        window.openEditModal = (id, name, item, eta, category) => {
             editingId = id;
             document.getElementById('edit-name').value = name;
             document.getElementById('edit-item').value = item;
             document.getElementById('edit-eta').value = eta;
+            document.getElementById('edit-category').value = category || 'Other';
             const m = document.getElementById('edit-modal');
             m.classList.remove('hidden'); m.classList.add('flex');
         };
 
-            window.closeEditModal = () => {
+        window.closeEditModal = () => {
             const m = document.getElementById('edit-modal');
             m.classList.add('hidden'); m.classList.remove('flex');
             editingId = null;
         };
 
         window.saveEdit = async () => {
-            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'mealItems', editingId), {
-                name: document.getElementById('edit-name').value,
-                item: document.getElementById('edit-item').value,
-                eta: document.getElementById('edit-eta').value
-            });
-            closeEditModal();
+            if (!db || !currentUser || !editingId) return;
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'mealItems', editingId), {
+                    name: document.getElementById('edit-name').value,
+                    item: document.getElementById('edit-item').value,
+                    eta: document.getElementById('edit-eta').value,
+                    category: document.getElementById('edit-category').value
+                });
+                closeEditModal();
+            } catch (err) { console.error("Edit failed:", err); }
         };
+
+        // Run on load
+        window.addEventListener('DOMContentLoaded', startApp);
     </script>
 </body>
 </html>
