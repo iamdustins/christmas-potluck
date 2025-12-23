@@ -174,23 +174,19 @@
         // =====================================================================
         // STEP 1: FIREBASE CONFIGURATION (FOR GITHUB)
         // =====================================================================
-        // To make this work on GitHub, you MUST replace 'null' with your config:
         
-        const EXTERNAL_FIREBASE_CONFIG = null; 
-
-        /* Paste your object here like this:
         const EXTERNAL_FIREBASE_CONFIG = {
-            apiKey: "AIza...",
-            authDomain: "...",
-            projectId: "...",
-            storageBucket: "...",
-            messagingSenderId: "...",
-            appId: "..."
-        };
-        */
+            apiKey: "AIzaSyAy8Tb6vQgtciBejIFs_fR-_UhuErWzeY0",
+            authDomain: "holidaytracker-f7465.firebaseapp.com",
+            projectId: "holidaytracker-f7465",
+            storageBucket: "holidaytracker-f7465.firebasestorage.app",
+            messagingSenderId: "848942019796",
+            appId: "1:848942019796:web:68240857fc875216c03741",
+            measurementId: "G-BL88BVEWX5"
+        }; 
+
         // =====================================================================
 
-        // State & Configuration
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'holiday-potluck-app';
         let db, auth, currentUser, editingId;
 
@@ -209,7 +205,7 @@
             const statusEl = document.getElementById('auth-status');
             try {
                 let config = null;
-                if (typeof __firebase_config !== 'undefined') {
+                if (typeof __firebase_config !== 'undefined' && __firebase_config) {
                     config = JSON.parse(__firebase_config);
                 } else if (EXTERNAL_FIREBASE_CONFIG) {
                     config = EXTERNAL_FIREBASE_CONFIG;
